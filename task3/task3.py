@@ -1,44 +1,61 @@
+from typing import List, Tuple
+import copy
 
 
-# it is timsort
-from typing import List
+def get_min_run(arr: List[int]) -> int:
+    """
+    Returns the minimum run size for timsort algorithm.
 
-# from numbers import Number
+    Args:
+        arr: A list of integers.
 
+    Returns:
+        The minimum run size.
 
-def getMinRun(arr: List[int]) -> int:
+    """
     return 32
-    # r = 0
-    # while n >= 64:
-    #     r |= n & 1
-    #     n >>= 1
-    # return n + r
 
 
-# todo generalize list int
-def foo(arr: List[int], minrun: int) -> None:
+def foo(arr: List[int], min_run: int) -> None:
     """
-    Changes arr in place like timsort would
+    Sorts the input list in place using the timsort algorithm.
+
+    Args:
+        arr: A list of integers to be sorted.
+        min_run: The minimum run size for timsort algorithm.
+
+    Returns:
+        None
+
     """
-    st = []
+    stack = []
 
     if len(arr) <= 1:
         return
 
     def gen_run(arr: List[int], p1: int) -> int:
+        """
+        Generates a run in the input list.
+
+        Args:
+            arr: A list of integers.
+            p1: The starting index of the run.
+
+        Returns:
+            The next index to start generating the next run.
+
+        """
         p1_start = p1
         run = []
 
         run_start, run_end = -1, -1
-        if arr[p1] <= arr[p1 + 1]:  # todo bug
+        if arr[p1] <= arr[p1 + 1]:
             run_start = p1
             run_end = p1 + 1
             keep_going = True
             while keep_going:
-                # Your code here
                 run.append(arr[p1])
-
-                run_end += 1  # run end points to el after last element in run
+                run_end += 1
                 if not (p1 + 1 < len(arr)) or not (arr[p1] <= arr[p1 + 1]):
                     keep_going = False
                 p1 += 1
@@ -48,42 +65,43 @@ def foo(arr: List[int], minrun: int) -> None:
 
             keep_going = True
             while keep_going:
-                # Your code here
                 run.append(arr[p1])
-
-                run_end += 1  # run end points to el after last element in run
+                run_end += 1
                 if not (p1 + 1 < len(arr)) or not (arr[p1] > arr[p1 + 1]):
                     keep_going = False
                 p1 += 1
-            arr[run_start:run_end] = arr[run_start:run_end][::-1]  # O(n)
+            arr[run_start:run_end] = arr[run_start:run_end][::-1]
 
-        if len(run) < minrun:
-            run_end = min(len(arr), run_start + minrun)
-            # run += arr[p1 : p1 + minrun - len(run)]
-            p1 = min(len(arr), p1 + minrun - len(run))
-        # we get array `run` which is partly or totally ascending
+        if len(run) < min_run:
+            run_end = min(len(arr), run_start + min_run)
+            p1 = min(len(arr), p1 + min_run - len(run))
 
         arr[run_start:run_end] = sorted(arr[run_start:run_end])
-        # todo use insertion sort here, performs well on almost-sorted data
-        st.append((p1_start, run_end - run_start))
+        stack.append((p1_start, run_end - run_start))
         return p1
 
-    # runs = [[]]
+    def timsort_merge(p1: int, l1: int, p2: int, l2: int) -> Tuple[int, int]:
+        """
+        Merges two runs in the input list.
 
-    import copy
+        Args:
+            p1: The starting index of the first run.
+            l1: The length of the first run.
+            p2: The starting index of the second run.
+            l2: The length of the second run.
 
-    def timsort_merge(p1: int, l1: int, p2: int, l2: int) -> (int, int):
+        Returns:
+            A tuple containing the starting index and length of the merged run.
 
+        """
         if p1 > p2:
             p1, l1, p2, l2 = p2, l2, p1, l1
-        # p_leftmost = p1 if p1 < p2 else p2
         p_leftmost = p1
         p1_start = p_leftmost
-        # l1 is smaller array now
         tmp = copy.deepcopy(arr[p1 : p1 + l1])
 
-        pt = 0  # pointer temporary
-        pb = p2  # pointer biggfer
+        pt = 0
+        pb = p2
         while pt < l1 and pb - p2 < l2:
             if tmp[pt] > arr[pb]:
                 arr[p_leftmost] = arr[pb]
@@ -93,8 +111,8 @@ def foo(arr: List[int], minrun: int) -> None:
                 arr[p_leftmost] = tmp[pt]
                 pt += 1
                 p_leftmost += 1
-        # copy remaining to
-        a1 = tmp[pt :]
+
+        a1 = tmp[pt:]
         a2 = arr[pb : p2 + l2]
         for a in a1:
             arr[p_leftmost] = a
@@ -103,61 +121,64 @@ def foo(arr: List[int], minrun: int) -> None:
             arr[p_leftmost] = a
             p_leftmost += 1
         return (p1_start, l1 + l2)
-        pass
 
     p = 0
     while p < len(arr):
         p = gen_run(arr, p)
-        # todo fix
 
-        # whenever hits 3 elements
-        if len(st) > 2:
-            xp, x = st[-1]
-            yp, y = st[-2]
-            zp, z = st[-3]
+        if len(stack) > 2:
+            xp, x = stack[-1]
+            yp, y = stack[-2]
+            zp, z = stack[-3]
             if not (x > y + z) or not (y > z):
-                # merge y with min(x,z)
                 if x < z:
-                    # pop y, x
-                    # push new
-                    st.pop()
-                    st.pop()
-                    st.append(timsort_merge(yp, y, xp, x))
-                    # merge y with x
-
+                    stack.pop()
+                    stack.pop()
+                    stack.append(timsort_merge(yp, y, xp, x))
                 else:
-                    st.pop(-3)
-                    st.pop(-2)
-                    st.append(timsort_merge(yp, y, zp, z))
-                    # merge y with z
+                    stack.pop(-3)
+                    stack.pop(-2)
+                    stack.append(timsort_merge(yp, y, zp, z))
 
-        if len(st) > 1:
-            xp, x = st[-1]
-            yp, y = st[-2]
+        if len(stack) > 1:
+            xp, x = stack[-1]
+            yp, y = stack[-2]
             if not y > x:
-                st.pop()
-                st.pop()
-                st.append(timsort_merge(yp, y, xp, x))
-                # merge x,y
-    if len(st) > 1:
-        # reempty stack to 1 element
-        xp, x = st[-1]
-        yp, y = st[-2]
-        st.pop()
-        st.pop()
-        st.append(timsort_merge(yp, y, xp, x))
-        # merge x,y
+                stack.pop()
+                stack.pop()
+                stack.append(timsort_merge(yp, y, xp, x))
+
+    if len(stack) > 1:
+        xp, x = stack[-1]
+        yp, y = stack[-2]
+        stack.pop()
+        stack.pop()
+        stack.append(timsort_merge(yp, y, xp, x))
 
 
 def timsort(arr: List[int]) -> List[int]:
+    """
+    Sorts the input list using the timsort algorithm.
+
+    Args:
+        arr: A list of integers to be sorted.
+
+    Returns:
+        The sorted list.
+
+    """
     foo(arr, 32)
     return arr
 
 
 def main() -> None:
+    """
+    Entry point of the program.
+
+    """
     arr = [2, 1]
-    minrun = getMinRun(arr)
-    foo(arr, minrun)  # sorts arr inplace
+    min_run = get_min_run(arr)
+    foo(arr, min_run)
     print(arr)
 
 
