@@ -2,12 +2,9 @@ from typing import List, Tuple
 import copy
 
 
-def get_min_run(arr: List[int]) -> int:
+def get_min_run() -> int:
     """
     Returns the minimum run size for timsort algorithm.
-
-    Args:
-        arr: A list of integers.
 
     Returns:
         The minimum run size.
@@ -98,7 +95,7 @@ def foo(arr: List[int], min_run: int) -> None:
             p1, l1, p2, l2 = p2, l2, p1, l1
         p_leftmost = p1
         p1_start = p_leftmost
-        tmp = copy.deepcopy(arr[p1 : p1 + l1])
+        tmp = copy.deepcopy(arr[p1:p1 + l1])
 
         pt = 0
         pb = p2
@@ -113,7 +110,7 @@ def foo(arr: List[int], min_run: int) -> None:
                 p_leftmost += 1
 
         a1 = tmp[pt:]
-        a2 = arr[pb : p2 + l2]
+        a2 = arr[pb:p2 + l2]
         for a in a1:
             arr[p_leftmost] = a
             p_leftmost += 1
@@ -171,16 +168,11 @@ def timsort(arr: List[int]) -> List[int]:
     return arr
 
 
-def main() -> None:
+if __name__ == "__main__":
     """
     Entry point of the program.
-
     """
     arr = [2, 1]
-    min_run = get_min_run(arr)
+    min_run = get_min_run()
     foo(arr, min_run)
     print(arr)
-
-
-if __name__ == "__main__":
-    main()

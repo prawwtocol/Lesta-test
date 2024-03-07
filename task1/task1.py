@@ -23,4 +23,3 @@ def isEvenBitwise(value: int) -> bool:
         True if the value is even, False otherwise.
     """
     return not (value & 1)
-
