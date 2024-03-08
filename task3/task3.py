@@ -6,6 +6,12 @@ def get_min_run(n: int) -> int:
     """
     Returns the minimum run size for timsort algorithm.
 
+    The minimum run size is calculated based on the length of the input list.
+    It is used as a parameter in the timsort algorithm.
+
+    Args:
+        n: An integer representing the length of the input list.
+
     Returns:
         The minimum run size.
 
@@ -22,25 +28,17 @@ def timsort(arr: List[int]) -> List[int]:
     """
     Sorts the input list using the timsort algorithm.
 
+    The timsort algorithm is a hybrid sorting algorithm derived from merge sort and insertion sort.
+    It is designed to perform well on many kinds of real-world data.
+
     Args:
         arr: A list of integers to be sorted.
 
     Returns:
         The sorted list.
-
     """
     min_run = get_min_run(len(arr))
-    """
-    Sorts the input list in place using the timsort algorithm.
 
-    Args:
-        arr: A list of integers to be sorted.
-        min_run: The minimum run size for timsort algorithm.
-
-    Returns:
-        None
-
-    """
     stack = []
 
     if len(arr) <= 1:
@@ -49,6 +47,9 @@ def timsort(arr: List[int]) -> List[int]:
     def gen_run(arr: List[int], p1: int) -> int:
         """
         Generates a run in the input list.
+
+        A run is a subsequence of the input list that is already sorted.
+        This function generates a run starting from the given index and returns the next index to start generating the next run.
 
         Args:
             arr: A list of integers.
@@ -76,7 +77,6 @@ def timsort(arr: List[int]) -> List[int]:
         if not dir_ascending:
             arr[run_start:run_end] = arr[run_start:run_end][::-1]
 
-
         if len(run) < min_run:
             run_end = min(len(arr), run_start + min_run)
             p1 = min(len(arr), p1 + min_run - len(run))
@@ -88,6 +88,8 @@ def timsort(arr: List[int]) -> List[int]:
     def timsort_merge(p1: int, l1: int, p2: int, l2: int) -> Tuple[int, int]:
         """
         Merges two runs in the input list.
+
+        This function merges two runs in the input list and returns the starting index and length of the merged run.
 
         Args:
             p1: The starting index of the first run.
