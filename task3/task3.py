@@ -2,7 +2,7 @@ from typing import List, Tuple
 import copy
 
 
-def get_min_run() -> int:
+def get_min_run(n: int) -> int:
     """
     Returns the minimum run size for timsort algorithm.
 
@@ -10,10 +10,26 @@ def get_min_run() -> int:
         The minimum run size.
 
     """
-    return 32
+    r = 0
+    while (n >= 64):
+        r |= n & 1
+        n >>= 1
+
+    return n + r
 
 
-def foo(arr: List[int], min_run: int) -> None:
+def timsort(arr: List[int]) -> List[int]:
+    """
+    Sorts the input list using the timsort algorithm.
+
+    Args:
+        arr: A list of integers to be sorted.
+
+    Returns:
+        The sorted list.
+
+    """
+    min_run = get_min_run(len(arr))
     """
     Sorts the input list in place using the timsort algorithm.
 
@@ -28,7 +44,7 @@ def foo(arr: List[int], min_run: int) -> None:
     stack = []
 
     if len(arr) <= 1:
-        return
+        return arr  # quit
 
     def gen_run(arr: List[int], p1: int) -> int:
         """
@@ -46,28 +62,20 @@ def foo(arr: List[int], min_run: int) -> None:
         run = []
 
         run_start, run_end = -1, -1
-        if arr[p1] <= arr[p1 + 1]:
-            run_start = p1
-            run_end = p1 + 1
-            keep_going = True
-            while keep_going:
-                run.append(arr[p1])
-                run_end += 1
-                if not (p1 + 1 < len(arr)) or not (arr[p1] <= arr[p1 + 1]):
-                    keep_going = False
-                p1 += 1
-        else:
-            run_start = p1
-            run_end = p1 + 1
 
-            keep_going = True
-            while keep_going:
-                run.append(arr[p1])
-                run_end += 1
-                if not (p1 + 1 < len(arr)) or not (arr[p1] > arr[p1 + 1]):
-                    keep_going = False
-                p1 += 1
+        dir_ascending = arr[p1] <= arr[p1 + 1]
+        run_start = p1
+        run_end = p1 + 1
+        keep_going = True
+        while keep_going:
+            run.append(arr[p1])
+            run_end += 1
+            if not (p1 + 1 < len(arr)) or not ((arr[p1] <= arr[p1 + 1]) == dir_ascending):
+                keep_going = False
+            p1 += 1
+        if not dir_ascending:
             arr[run_start:run_end] = arr[run_start:run_end][::-1]
+
 
         if len(run) < min_run:
             run_end = min(len(arr), run_start + min_run)
@@ -151,20 +159,6 @@ def foo(arr: List[int], min_run: int) -> None:
         stack.pop()
         stack.pop()
         stack.append(timsort_merge(yp, y, xp, x))
-
-
-def timsort(arr: List[int]) -> List[int]:
-    """
-    Sorts the input list using the timsort algorithm.
-
-    Args:
-        arr: A list of integers to be sorted.
-
-    Returns:
-        The sorted list.
-
-    """
-    foo(arr, 32)
     return arr
 
 
@@ -173,6 +167,5 @@ if __name__ == "__main__":
     Entry point of the program.
     """
     arr = [2, 1]
-    min_run = get_min_run()
-    foo(arr, min_run)
+    timsort(arr)
     print(arr)
