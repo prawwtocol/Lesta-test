@@ -17,7 +17,7 @@ def get_min_run(n: int) -> int:
 
     """
     r = 0
-    while (n >= 64):
+    while n >= 64:
         r |= n & 1
         n >>= 1
 
@@ -28,7 +28,8 @@ def timsort(arr: List[int]) -> List[int]:
     """
     Sorts the input list using the timsort algorithm.
 
-    The timsort algorithm is a hybrid sorting algorithm derived from merge sort and insertion sort.
+    The timsort algorithm is a hybrid sorting algorithm derived from
+    merge sort and insertion sort.
     It is designed to perform well on many kinds of real-world data.
 
     Args:
@@ -49,7 +50,8 @@ def timsort(arr: List[int]) -> List[int]:
         Generates a run in the input list.
 
         A run is a subsequence of the input list that is already sorted.
-        This function generates a run starting from the given index and returns the next index to start generating the next run.
+        This function generates a run starting from the given index
+        and returns the next index to start generating the next run.
 
         Args:
             arr: A list of integers.
@@ -71,7 +73,9 @@ def timsort(arr: List[int]) -> List[int]:
         while keep_going:
             run.append(arr[p1])
             run_end += 1
-            if not (p1 + 1 < len(arr)) or not ((arr[p1] <= arr[p1 + 1]) == dir_ascending):
+            if not (p1 + 1 < len(arr)) or not (
+                (arr[p1] <= arr[p1 + 1]) == dir_ascending
+            ):
                 keep_going = False
             p1 += 1
         if not dir_ascending:
@@ -89,7 +93,8 @@ def timsort(arr: List[int]) -> List[int]:
         """
         Merges two runs in the input list.
 
-        This function merges two runs in the input list and returns the starting index and length of the merged run.
+        This function merges two runs in the input list and
+        returns the starting index and length of the merged run.
 
         Args:
             p1: The starting index of the first run.
@@ -105,7 +110,7 @@ def timsort(arr: List[int]) -> List[int]:
             p1, l1, p2, l2 = p2, l2, p1, l1
         p_leftmost = p1
         p1_start = p_leftmost
-        tmp = copy.deepcopy(arr[p1:p1 + l1])
+        tmp = copy.deepcopy(arr[p1 : p1 + l1])
 
         pt = 0
         pb = p2
@@ -120,7 +125,7 @@ def timsort(arr: List[int]) -> List[int]:
                 p_leftmost += 1
 
         a1 = tmp[pt:]
-        a2 = arr[pb:p2 + l2]
+        a2 = arr[pb : p2 + l2]
         for a in a1:
             arr[p_leftmost] = a
             p_leftmost += 1
@@ -162,12 +167,3 @@ def timsort(arr: List[int]) -> List[int]:
         stack.pop()
         stack.append(timsort_merge(yp, y, xp, x))
     return arr
-
-
-if __name__ == "__main__":
-    """
-    Entry point of the program.
-    """
-    arr = [2, 1]
-    timsort(arr)
-    print(arr)
