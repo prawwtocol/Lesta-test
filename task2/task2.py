@@ -3,13 +3,30 @@ from typing import List, Any
 
 
 class EmptyBufferError(Exception):
+    """
+    Exception raised when trying to dequeue from an empty buffer.
+    """
+
     pass
 
 
 class CircularBufferList:
     """
-    Circular Buffer implementation with lists
+    Circular Buffer implementation with lists.
+
+    This class provides a circular buffer data structure using a
+    list as the underlying storage.
+    The buffer has a fixed capacity and supports
+    enqueue and dequeue operations.
+
+    Attributes:
+        buffer (List[Any]): The underlying list used to store the buffer items.
+        capacity (int): The maximum number of items the buffer can hold.
+        head (int): The index of the first item in the buffer.
+        tail (int): The index where the next item will be added.
+        occupancy (int): The number of items currently in the buffer.
     """
+
     def __init__(self, capacity: int):
         """
         Initialize the CircularBufferList with the given capacity.
@@ -65,7 +82,6 @@ class CircularBufferList:
         Raises:
             IndexError: If the buffer is empty.
         """
-
         if self.is_empty():
             raise EmptyBufferError("Trying to dequeue from empty buffer")
         item = self.buffer[self.head]
@@ -85,9 +101,26 @@ class CircularBufferList:
 
 class CircularBufferDeque:
     """
-    Circular Buffer implementation with deques
+    Circular Buffer implementation with deques.
+
+    This class provides a circular buffer data structure
+    using a deque as the underlying storage.
+    The buffer has a fixed capacity and supports
+    enqueue and dequeue operations.
+
+    Attributes:
+        capacity (int): The maximum number of items the buffer can hold.
+        buffer (deque[Any]): The underlying deque
+            used to store the buffer items.
     """
+
     def __init__(self, capacity: int) -> None:
+        """
+        Initialize the CircularBufferDeque with the given capacity.
+
+        Args:
+            capacity (int): The maximum number of items the buffer can hold.
+        """
         self.capacity = capacity
         self.buffer: deque[Any] = deque(maxlen=capacity)
 
