@@ -6,10 +6,13 @@ class EmptyBufferError(Exception):
     pass
 
 
-class CircularBuffer:
+class CircularBufferList:
+    """
+    Circular Buffer implementation with lists
+    """
     def __init__(self, capacity: int):
         """
-        Initialize the CircularBuffer with the given capacity.
+        Initialize the CircularBufferList with the given capacity.
 
         Args:
             capacity (int): The maximum number of items the buffer can hold.
@@ -80,7 +83,10 @@ class CircularBuffer:
         return self.occupancy
 
 
-class CircularBuffer2:
+class CircularBufferDeque:
+    """
+    Circular Buffer implementation with deques
+    """
     def __init__(self, capacity: int) -> None:
         self.capacity = capacity
         self.buffer: deque[Any] = deque(maxlen=capacity)
@@ -104,7 +110,6 @@ class CircularBuffer2:
         Raises:
             IndexError: If the buffer is empty.
         """
-        # todo remove self
         if self.is_empty():
             raise EmptyBufferError("Trying to dequeue from empty buffer")
         else:
