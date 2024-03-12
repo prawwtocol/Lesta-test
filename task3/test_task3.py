@@ -1,8 +1,8 @@
 import task3
 import random
+from typing import Any
 
 
-# todo more tests
 def test_empty_list() -> None:
     assert task3.timsort([]) == []
 
@@ -146,28 +146,22 @@ def test_multiple_elements() -> None:
     ]  # Mixed
 
 
-def test_random_elements() -> None:
-    random_array = random.sample(range(1, 1001), 100)
-    sorted_array = sorted(random_array)
-    assert task3.timsort(random_array) == sorted_array
+def sort_rand_array(n: int = 10000) -> bool:
+    random_array = random.sample(range(-10 * n, 10 * n), n)
+    return task3.timsort(random_array) == sorted(random_array)
 
 
 def test_random_elements_l() -> None:
-    n = 1000
-    random_array = random.sample(range(-10 * n, 10 * n), n)
-    sorted_array = sorted(random_array)
-    assert task3.timsort(random_array) == sorted_array
+    assert sort_rand_array(1000)
 
 
 def test_random_elements_xl() -> None:
-    n = 10000
-    random_array = random.sample(range(-10 * n, 10 * n), n)
-    sorted_array = sorted(random_array)
-    assert task3.timsort(random_array) == sorted_array
+    assert sort_rand_array(10000)
 
 
 def test_random_elements_xxl() -> None:
-    n = 10000
-    random_array = random.sample(range(-10 * n, 10 * n), n)
-    sorted_array = sorted(random_array)
-    assert task3.timsort(random_array) == sorted_array
+    assert sort_rand_array(50000)
+
+
+def test_benchmark(benchmark: Any) -> None:
+    benchmark(sort_rand_array, 40000)
