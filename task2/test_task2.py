@@ -1,9 +1,30 @@
+"""
+This module contains unit tests for the CircularBufferList
+and CircularBufferDeque classes.
+
+The CircularBufferList class is tested for its initialization,
+enqueue, and dequeue methods.
+The CircularBufferDeque class is also tested for its
+initialization, enqueue, and dequeue methods.
+
+Additionally, benchmark tests are included for both classes to measure
+their performance.
+"""
+
 import pytest
 from task2 import CircularBufferList, CircularBufferDeque
 from typing import Any
 
 
 def test_circular_buffer_list() -> None:
+    """
+    Test the functionality of the CircularBufferList class.
+
+    This function tests the initialization, enqueue, and dequeue
+    operations of the CircularBufferList class.
+    It asserts various conditions to ensure that the CircularBufferList
+    behaves as expected.
+    """
     # Test initialization
     buffer = CircularBufferList(3)
     assert buffer.size() == 0
@@ -48,6 +69,14 @@ def test_circular_buffer_list() -> None:
 
 
 def test_circular_buffer_deque() -> None:
+    """
+    Test the functionality of the CircularBufferDeque class.
+
+    This function tests the initialization, enqueue, and dequeue
+    operations of the CircularBufferDeque class.
+    It asserts various conditions to ensure that the CircularBufferDeque
+    behaves as expected.
+    """
     # Test initialization
     buffer = CircularBufferDeque(3)
     assert buffer.size() == 0
@@ -92,6 +121,9 @@ def test_circular_buffer_deque() -> None:
 
 
 def test_bench_circular_buffer_list(benchmark: Any) -> None:
+    """
+    Test function for benchmarking the CircularBufferDeque class.
+    """
     def test_circular_buffer_list_200() -> None:
         buffer = CircularBufferList(205)
         for i in range(1, 201):
@@ -104,10 +136,14 @@ def test_bench_circular_buffer_list(benchmark: Any) -> None:
             buffer.size()
             buffer.is_empty()
             buffer.is_full()
+
     benchmark(test_circular_buffer_list_200)
 
 
 def test_bench_circular_buffer_deque(benchmark: Any) -> None:
+    """
+    Test function for benchmarking the CircularBufferList class.
+    """
     def test_circular_buffer_deque_200() -> None:
         buffer = CircularBufferDeque(205)
         for i in range(1, 201):
@@ -120,4 +156,5 @@ def test_bench_circular_buffer_deque(benchmark: Any) -> None:
             buffer.size()
             buffer.is_empty()
             buffer.is_full()
+
     benchmark(test_circular_buffer_deque_200)

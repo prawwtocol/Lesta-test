@@ -1,3 +1,12 @@
+"""
+This module provides two implementations of a circular buffer:
+CircularBufferList and CircularBufferDeque.
+
+CircularBufferList is implemented using a list as the underlying storage,
+while CircularBufferDeque is implemented using a deque.
+Both implementations have a fixed capacity and support enqueue
+and dequeue operations.
+"""
 from collections import deque
 from typing import List, Any
 
@@ -6,7 +15,6 @@ class EmptyBufferError(Exception):
     """
     Exception raised when trying to dequeue from an empty buffer.
     """
-
     pass
 
 
