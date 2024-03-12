@@ -1,3 +1,12 @@
+"""
+This module contains unit tests for the Timsort algorithm implementation.
+
+The implementation is tested for its edge cases like: empty list,
+negative numbers, large random lists.
+
+Additionally, benchmark tests are included to measure performance.
+"""
+
 import task3
 import random
 from typing import Any

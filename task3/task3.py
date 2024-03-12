@@ -1,3 +1,14 @@
+"""
+This module provides a Python implementation of the Timsort algorithm.
+
+The module contains a main function `timsort` which sorts an input list
+using the Timsort algorithm.
+
+It also contains a helper class `TimsortHelper` which provides methods
+for generating runs, merging runs, and sorting the input list using the
+Timsort algorithm.
+"""
+
 from typing import List, Tuple
 import copy
 
@@ -20,6 +31,22 @@ def timsort(arr: List[int]) -> List[int]:
 
 
 class TimsortHelper:
+    """
+    Helper class for performing timsort algorithm.
+
+    This class provides methods for generating runs, merging runs,
+    and sorting the input list using the timsort algorithm.
+
+    Args:
+        arr: A list of integers to be sorted.
+
+    Attributes:
+        arr: The input list to be sorted.
+        arr_len: The length of the input list.
+        stack: A stack to store information about runs.
+        min_run: The minimum run size for timsort algorithm.
+    """
+
     def __init__(self, arr: List[int]) -> None:
         self.arr = arr
         self.arr_len = len(arr)
@@ -34,13 +61,10 @@ class TimsortHelper:
         of the input list.
         It is used as a parameter in the timsort algorithm.
 
-        Args:
-            arr_length: An integer representing the length of the input list.
-
         Returns:
             The minimum run size.
-
         """
+        # Implementation details:
         # https://web.archive.org/web/20160128232837/https://hg.python.org/cpython/file/tip/Objects/listsort.txt
         bit_cardinality = 0
         N = self.arr_len
@@ -62,7 +86,6 @@ class TimsortHelper:
 
         Returns:
             The next index to start generating the next run.
-
         """
         run = []
 
@@ -110,7 +133,6 @@ class TimsortHelper:
 
         Returns:
             A tuple containing the starting index and length of the merged run.
-
         """
         if p1 > p2:
             p1, l1, p2, l2 = p2, l2, p1, l1
@@ -154,6 +176,12 @@ class TimsortHelper:
         return (saved_p1, l1 + l2)
 
     def sort(self) -> List[int]:
+        """
+        Sorts the input list using the timsort algorithm.
+
+        Returns:
+            The sorted list.
+        """
         if self.arr_len <= 1:
             # Nothing to sort
             return self.arr

@@ -7,6 +7,7 @@ while CircularBufferDeque is implemented using a deque.
 Both implementations have a fixed capacity and support enqueue
 and dequeue operations.
 """
+
 from collections import deque
 from typing import List, Any
 
@@ -15,6 +16,7 @@ class EmptyBufferError(Exception):
     """
     Exception raised when trying to dequeue from an empty buffer.
     """
+
     pass
 
 

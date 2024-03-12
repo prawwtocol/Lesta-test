@@ -124,6 +124,7 @@ def test_bench_circular_buffer_list(benchmark: Any) -> None:
     """
     Test function for benchmarking the CircularBufferDeque class.
     """
+
     def test_circular_buffer_list_200() -> None:
         buffer = CircularBufferList(205)
         for i in range(1, 201):
@@ -144,6 +145,7 @@ def test_bench_circular_buffer_deque(benchmark: Any) -> None:
     """
     Test function for benchmarking the CircularBufferList class.
     """
+
     def test_circular_buffer_deque_200() -> None:
         buffer = CircularBufferDeque(205)
         for i in range(1, 201):

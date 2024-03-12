@@ -1,3 +1,8 @@
+"""
+This module provides functions to check if a given
+value is even using different methods.
+"""
+
 
 def isEvenRemainder(value: int) -> bool:
     """

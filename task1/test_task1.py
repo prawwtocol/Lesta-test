@@ -1,6 +1,12 @@
-import task1
+"""
+This module contains unit tests for the functions in the 'task1' module.
 
-# todo test performance on self
+The 'test_even' function tests the 'isEvenRemainder'
+and 'isEvenBitwise' functions
+for even numbers, while the 'test_odd' function tests them for odd numbers.
+"""
+
+import task1
 
 
 def test_even() -> None:
