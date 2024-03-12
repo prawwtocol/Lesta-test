@@ -2,28 +2,6 @@ from typing import List, Tuple
 import copy
 
 
-def get_min_run(n: int) -> int:
-    """
-    Returns the minimum run size for timsort algorithm.
-
-    The minimum run size is calculated based on the length of the input list.
-    It is used as a parameter in the timsort algorithm.
-
-    Args:
-        n: An integer representing the length of the input list.
-
-    Returns:
-        The minimum run size.
-
-    """
-    r = 0
-    while n >= 64:
-        r |= n & 1
-        n >>= 1
-
-    return n + r
-
-
 def timsort(arr: List[int]) -> List[int]:
     """
     Sorts the input list using the timsort algorithm.
@@ -38,14 +16,40 @@ def timsort(arr: List[int]) -> List[int]:
     Returns:
         The sorted list.
     """
-    min_run = get_min_run(len(arr))
+    return TimsortHelper(arr).sort()
 
-    stack = []
 
-    if len(arr) <= 1:
-        return arr  # quit
+class TimsortHelper:
+    def __init__(self, arr: List[int]) -> None:
+        self.arr = arr
+        self.arr_len = len(arr)
+        self.stack: List[Tuple[int, int]] = []
+        self.min_run = self.get_min_run()
 
-    def gen_run(arr: List[int], p1: int) -> int:
+    def get_min_run(self) -> int:
+        """
+        Returns the minimum run size for timsort algorithm.
+
+        The minimum run size is calculated based on the length
+        of the input list.
+        It is used as a parameter in the timsort algorithm.
+
+        Args:
+            arr_length: An integer representing the length of the input list.
+
+        Returns:
+            The minimum run size.
+
+        """
+        # https://web.archive.org/web/20160128232837/https://hg.python.org/cpython/file/tip/Objects/listsort.txt
+        bit_cardinality = 0
+        N = self.arr_len
+        while N >= 64:
+            bit_cardinality |= N & 1
+            N >>= 1
+        return N + bit_cardinality
+
+    def generate_run(self, start_index: int) -> int:
         """
         Generates a run in the input list.
 
@@ -54,42 +58,44 @@ def timsort(arr: List[int]) -> List[int]:
         and returns the next index to start generating the next run.
 
         Args:
-            arr: A list of integers.
-            p1: The starting index of the run.
+            start_index: The starting index of the run.
 
         Returns:
             The next index to start generating the next run.
 
         """
-        p1_start = p1
         run = []
 
-        run_start, run_end = -1, -1
+        run_start_index, run_end_index = start_index, start_index + 1
+        rsi, rei = run_start_index, run_end_index
 
-        dir_ascending = arr[p1] <= arr[p1 + 1]
-        run_start = p1
-        run_end = p1 + 1
+        is_ascending = self.arr[start_index] <= self.arr[start_index + 1]
         keep_going = True
         while keep_going:
-            run.append(arr[p1])
-            run_end += 1
-            if not (p1 + 1 < len(arr)) or not (
-                (arr[p1] <= arr[p1 + 1]) == dir_ascending
+            run.append(self.arr[start_index])
+            rei += 1
+            if not (start_index + 1 < self.arr_len) or not (
+                (self.arr[start_index] <= self.arr[start_index + 1])
+                == is_ascending
             ):
                 keep_going = False
-            p1 += 1
-        if not dir_ascending:
-            arr[run_start:run_end] = arr[run_start:run_end][::-1]
+            start_index += 1
+        if not is_ascending:
+            self.arr[rsi:rei] = self.arr[rsi:rei][::-1]
 
-        if len(run) < min_run:
-            run_end = min(len(arr), run_start + min_run)
-            p1 = min(len(arr), p1 + min_run - len(run))
+        if len(run) < self.min_run:
+            rei = min(self.arr_len, rsi + self.min_run)
+            start_index = min(
+                self.arr_len, start_index + self.min_run - len(run)
+            )
 
-        arr[run_start:run_end] = sorted(arr[run_start:run_end])
-        stack.append((p1_start, run_end - run_start))
-        return p1
+        self.arr[rsi:rei] = sorted(self.arr[rsi:rei])
+        self.stack.append((rsi, rei - rsi))
+        return start_index
 
-    def timsort_merge(p1: int, l1: int, p2: int, l2: int) -> Tuple[int, int]:
+    def merge_runs(
+        self, p1: int, l1: int, p2: int, l2: int
+    ) -> Tuple[int, int]:
         """
         Merges two runs in the input list.
 
@@ -108,62 +114,81 @@ def timsort(arr: List[int]) -> List[int]:
         """
         if p1 > p2:
             p1, l1, p2, l2 = p2, l2, p1, l1
-        p_leftmost = p1
-        p1_start = p_leftmost
-        tmp = copy.deepcopy(arr[p1 : p1 + l1])
 
-        pt = 0
-        pb = p2
-        while pt < l1 and pb - p2 < l2:
-            if tmp[pt] > arr[pb]:
-                arr[p_leftmost] = arr[pb]
-                pb += 1
-                p_leftmost += 1
+        # copy leftmost array to tmp arr
+        tmp_arr = copy.deepcopy(self.arr[p1 : p1 + l1])
+
+        # main pointer iterates over arr, overwriting it with
+        # min(tmp_arr[lp],self.arr[rp])
+        main_pointer = p1
+
+        # save p1 position to push on stack later
+        saved_p1 = p1
+
+        # left_pointer iterates over the leftmost run
+        left_pointer = 0
+        lp = left_pointer
+        # right_pointer iterates over the rightmost run
+        right_pointer = p2
+        rp = right_pointer
+        while lp < l1 and rp - p2 < l2:
+            if tmp_arr[lp] > self.arr[rp]:
+                self.arr[main_pointer] = self.arr[rp]
+                rp += 1
+                main_pointer += 1
             else:
-                arr[p_leftmost] = tmp[pt]
-                pt += 1
-                p_leftmost += 1
+                self.arr[main_pointer] = tmp_arr[lp]
+                lp += 1
+                main_pointer += 1
 
-        a1 = tmp[pt:]
-        a2 = arr[pb : p2 + l2]
+        a1 = tmp_arr[lp:]
+        a2 = self.arr[rp : p2 + l2]
         for a in a1:
-            arr[p_leftmost] = a
-            p_leftmost += 1
+            self.arr[main_pointer] = a
+            main_pointer += 1
         for a in a2:
-            arr[p_leftmost] = a
-            p_leftmost += 1
-        return (p1_start, l1 + l2)
+            self.arr[main_pointer] = a
+            main_pointer += 1
 
-    p = 0
-    while p < len(arr):
-        p = gen_run(arr, p)
+        # push new stack info onto stack
+        return (saved_p1, l1 + l2)
 
-        if len(stack) > 2:
-            xp, x = stack[-1]
-            yp, y = stack[-2]
-            zp, z = stack[-3]
-            if not (x > y + z) or not (y > z):
-                if x < z:
-                    stack.pop()
-                    stack.pop()
-                    stack.append(timsort_merge(yp, y, xp, x))
-                else:
-                    stack.pop(-3)
-                    stack.pop(-2)
-                    stack.append(timsort_merge(yp, y, zp, z))
+    def sort(self) -> List[int]:
+        if self.arr_len <= 1:
+            # Nothing to sort
+            return self.arr
 
-        if len(stack) > 1:
-            xp, x = stack[-1]
-            yp, y = stack[-2]
-            if not y > x:
-                stack.pop()
-                stack.pop()
-                stack.append(timsort_merge(yp, y, xp, x))
+        # Go with pointer from left to right to divide arr in runs:
+        pointer = 0
+        while pointer < self.arr_len:
+            pointer = self.generate_run(pointer)
 
-    if len(stack) > 1:
-        xp, x = stack[-1]
-        yp, y = stack[-2]
-        stack.pop()
-        stack.pop()
-        stack.append(timsort_merge(yp, y, xp, x))
-    return arr
+            if len(self.stack) > 2:
+                xp, x = self.stack[-1]
+                yp, y = self.stack[-2]
+                zp, z = self.stack[-3]
+                if not (x > y + z) or not (y > z):
+                    if x < z:
+                        self.stack.pop()
+                        self.stack.pop()
+                        self.stack.append(self.merge_runs(yp, y, xp, x))
+                    else:
+                        self.stack.pop(-3)
+                        self.stack.pop(-2)
+                        self.stack.append(self.merge_runs(yp, y, zp, z))
+
+            if len(self.stack) > 1:
+                xp, x = self.stack[-1]
+                yp, y = self.stack[-2]
+                if not y > x:
+                    self.stack.pop()
+                    self.stack.pop()
+                    self.stack.append(self.merge_runs(yp, y, xp, x))
+
+        if len(self.stack) > 1:
+            xp, x = self.stack[-1]
+            yp, y = self.stack[-2]
+            self.stack.pop()
+            self.stack.pop()
+            self.stack.append(self.merge_runs(yp, y, xp, x))
+        return self.arr
